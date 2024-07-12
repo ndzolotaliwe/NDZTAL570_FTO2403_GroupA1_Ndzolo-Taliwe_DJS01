@@ -1,8 +1,5 @@
 /**
- * Debugging Guide
- * 1. Make the code more readable
- * 2. Pick up calculation errors
- * 3. Make these calculations robust such that the calculation does not give an incorrect result, it throws an error to the user if something has gone wrong (parameter used with an incorrect unit of measurement, etc)
+ * Mars Climate Orbiter Challenge Solution
  */
 
 // Given Parameters
@@ -13,22 +10,36 @@ const d = 0; // distance (km)
 const fuel = 5000; // remaining fuel (kg)
 const fbr = 0.5; // fuel burn rate (kg/s)
 
-
-const d2 = d + (vel*time) //calcultes new distance
-const rf = fbr*time //calculates remaining fuel
-const vel2 = calcNewVel(acc, vel, time) //calculates new velocity based on acceleration
-
-// Pick up an error with how the function below is called and make it robust to such errors
-calcNewVel = (vel, acc, time) => { 
-  return vel + (acc*time)
+// Function to calculate new velocity (convert units appropriately)
+const calcNewVel = ({ vel, acc, time }) => { 
+  const velMetersPerSecond = vel * 1000 / 3600; // Convert km/h to m/s
+  const newVelMetersPerSecond = velMetersPerSecond + acc * time;
+  const newVelKmPerHour = newVelMetersPerSecond * 3600 / 1000; // Convert m/s back to km/h
+  return newVelKmPerHour;
 }
 
-console.log(`Corrected New Velocity: ${vel2} km/h`);
-console.log(`Corrected New Distance: ${d2} km`);
-console.log(`Corrected Remaining Fuel: ${rf} kg`);
+// Function to calculate new distance (convert units appropriately)
+const calcNewDistance = ({ vel, time }) => {
+  const newDistance = vel * 1000 * (time / 3600); // Convert km/h to m/s for velocity and seconds to hours for time
+  return newDistance;
+}
 
+// Function to calculate remaining fuel
+const calcRemainingFuel = ({ fuel, fbr, time }) => {
+  const remainingFuel = fuel - fbr * time;
+  if (remainingFuel < 0) {
+    throw new Error("Insufficient fuel. Mission aborted.");
+  }
+  return remainingFuel;
+}
 
+// Perform calculations
+const newVelocity = calcNewVel({ vel, acc, time });
+const newDistance = calcNewDistance({ vel, time });
+const remainingFuel = calcRemainingFuel({ fuel, fbr, time });
 
-
-
+// Output corrected values
+console.log(`Corrected New Velocity: ${newVelocity.toFixed(2)} km/h`);
+console.log(`Corrected New Distance: ${newDistance.toFixed(2)} km`);
+console.log(`Corrected Remaining Fuel: ${remainingFuel.toFixed(2)} kg`);
 
